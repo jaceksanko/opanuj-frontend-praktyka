@@ -1,0 +1,1 @@
+export const DIVISION_BY_ZERO_MESSAGE = 'Cannot divide by zero';
