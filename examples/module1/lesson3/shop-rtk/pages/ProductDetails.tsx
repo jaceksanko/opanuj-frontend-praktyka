@@ -1,24 +1,25 @@
-import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { CartContext } from '../contexts/CartContext';
-import { ProductContext } from '../contexts/ProductContext';
+import { useGetProductByIdQuery } from '../services/productsApi';
+import { useAppDispatch } from '../hooks/rtk';
+import { addToCart } from '../state/cartSlice';
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const { addToCart } = useContext(CartContext);
-  const { products } = useContext(ProductContext);
+  const {
+    data: product,
+    isLoading,
+    isError,
+  } = useGetProductByIdQuery(parseInt(id || ''));
+  const dispatch = useAppDispatch();
 
-  const product = products.find((item) => {
-    return item.id === parseInt(id!);
-  });
-
-  if (!product) {
+  if (isLoading) {
     return (
       <section className="h-screen flex justify-center items-center">
         Loading...
       </section>
     );
   }
+  if (isError || !product) return <div>Error</div>;
 
   const { title, price, description, image } = product;
   return (
@@ -41,7 +42,7 @@ const ProductDetails = () => {
             <p className="mb-8">{description}</p>
             <button
               data-testid="add-to-cart-button"
-              onClick={() => addToCart(product)}
+              onClick={() => dispatch(addToCart(product))}
               className="bg-green-600 py-4 px-8 text-white"
             >
               Add to cart
