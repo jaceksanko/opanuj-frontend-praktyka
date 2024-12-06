@@ -1,16 +1,10 @@
 import { useContext } from 'react';
-import { useParams } from 'react-router-dom';
 import { CartContext } from '../contexts/CartContext';
 import { ProductContext } from '../contexts/ProductContext';
 
 const ProductDetails = () => {
-  const { id } = useParams();
   const { addToCart } = useContext(CartContext);
-  const { products } = useContext(ProductContext);
-
-  const product = products.find((item) => {
-    return item.id === parseInt(id!);
-  });
+  const { product } = useContext(ProductContext);
 
   if (!product) {
     return (

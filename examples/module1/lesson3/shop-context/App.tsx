@@ -7,17 +7,14 @@ import ProductDetails from './pages/ProductDetails';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 
-const App = () => {
+const App = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="overflow-hidden">
       <Router>
         <Header setIsSidebarOpen={setIsSidebarOpen} />
-        <Routes>
-          <Route path="/" element={<Home />}></Route>
-          <Route path="/product/:id" element={<ProductDetails />}></Route>
-        </Routes>
+        {children}
         <Sidebar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
