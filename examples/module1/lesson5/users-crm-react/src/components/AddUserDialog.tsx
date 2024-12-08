@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAddUser } from '../hooks/useUsers';
 
 interface AddUserDialogProps {
   isOpen: boolean;
@@ -8,8 +9,16 @@ interface AddUserDialogProps {
 const AddUserDialog = ({ isOpen, onClose }: AddUserDialogProps) => {
   const [name, setName] = useState('');
   const [status, setStatus] = useState('New');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { mutate, isPending } = useAddUser();
+
+  const closeDialog = () => {
+    setName('');
+    setStatus('New');
+    setError(null);
+    onClose();
+  };
 
   const statuses = [
     'New',
@@ -27,34 +36,13 @@ const AddUserDialog = ({ isOpen, onClose }: AddUserDialogProps) => {
       setError('Name is required');
       return;
     }
-
-    setLoading(true);
     setError(null);
-
     try {
-      const response = await fetch('http://localhost:3000/api/data/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, status }),
-      });
-
-      if (!response.ok) throw new Error('Failed to add user');
-
+      await mutate({ name, status });
       closeDialog();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to add user');
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      setError('Failed to add user');
     }
-  };
-
-  const closeDialog = () => {
-    setName('');
-    setStatus('New');
-    setError(null);
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -134,10 +122,10 @@ const AddUserDialog = ({ isOpen, onClose }: AddUserDialogProps) => {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? 'Adding...' : 'Add Contact'}
+              {isPending ? 'Adding...' : 'Add Contact'}
             </button>
           </div>
         </form>
